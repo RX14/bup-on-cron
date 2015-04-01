@@ -32,3 +32,7 @@ There is also a substitution mode where and array of names is substituted into a
 }
 ```
 The above example produces identical results to the previous example.
+
+Tips
+----
+You can use the `BUP_DIR` environment variable to specify the backup location
