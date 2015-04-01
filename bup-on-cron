@@ -34,4 +34,5 @@ end
 backupdirs.each do |path, name|
     bup "index #{path}"
     bup "save -n #{name} #{path}"
+    puts
 end
