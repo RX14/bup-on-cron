@@ -26,13 +26,19 @@ backupdirs_json.each do |path, obj|
 end
 
 def bup(cmd)
-    cmd = "bup on #{@ssh_args} #{cmd}"
+    cmd = "bup #{cmd}"
     puts "$ #{cmd}"
     `#{cmd}`
 end
 
+def bup_on(cmd)
+    bup "on #{@ssh_args} #{cmd}"
+end
+
 backupdirs.each do |path, name|
-    bup "index #{path}"
-    bup "save -n #{name} #{path}"
+    bup_on "index #{path}"
+    bup_on "save -n #{name} #{path}"
     puts
 end
+
+bup "fsck -g"
