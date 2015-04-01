@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+require "json"
+
+abort "USAGE: bup-on-cron <ssh-args> <path-to-backupdirs.json>" if ARGV.size != 2
+
+@ssh_args = ARGV[0]
+backupdirs_file = ARGV[1]
+
+ssh_path = `which ssh`.strip
+abort "SSH not in PATH" unless $?.success?
+
+backupdirs_json = JSON.parse(`#{ssh_path} #{@ssh_args} 'cat #{backupdirs_file}'`)
+
+backupdirs = {}
+backupdirs_json.each do |path, obj|
+    if obj.is_a? String
+        backupdirs[path] = obj
+    elsif obj.is_a? Array
+        obj.each do |insert|
+            path_new = path.gsub "$$", insert
+            backupdirs[path_new] = insert
+        end
+    else
+        abort "backupdirs parse error"
+    end
+end
+
+def bup(cmd)
+    cmd = "bup on #{@ssh_args} #{cmd}"
+    puts "$ #{cmd}"
+    `#{cmd}`
+end
+
+backupdirs.each do |path, name|
+    bup "index #{path}"
+    bup "save -n #{name} #{path}"
+end
